@@ -3,9 +3,9 @@
 int main(void)
 {
     //Real esta caindo como variavel e primeira leitura esta separada
-    abrirarquivo();
+    //abrirarquivo();
     printf("\n\n\n");
-    lerStruct(tk);
+    programaEBloco(tk);
 
     return 0;
 }

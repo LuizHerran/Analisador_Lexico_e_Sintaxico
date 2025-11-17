@@ -48,8 +48,8 @@ typedef struct{
     char *variavel;
     char  simbolo;
     char  *simbolos;
-}leituraDeLinha[4095];
-leituraDeLinha tk;
+}leituraDeLinha;
+leituraDeLinha tk[4095];
 int contador = 0;
 
 //Leitura de arquivo
@@ -59,7 +59,7 @@ int verificador = 0;
 char linha[256];
 
 //Identifica o caracter ou palavra e armazena em leituraDeLinha
-char* recuperaTipoDado(char *token, leituraDeLinha tk){  
+char* recuperaTipoDado(char *token, leituraDeLinha tk[]){  
 
     //Verifica se ele é um simbolo
     if(strlen(token) == 1 && !isdigit(token[0])){
@@ -318,7 +318,7 @@ void abrirarquivo(){
     fclose(ptr_file_in);
 }
 
-void lerStruct(leituraDeLinha tk){
+void lerStruct(leituraDeLinha tk[]){
 
     FILE *f_out = fopen("leitura.lex", "w");
     
