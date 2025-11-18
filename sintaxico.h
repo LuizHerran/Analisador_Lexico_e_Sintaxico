@@ -5,8 +5,6 @@
 #define TOKEN_IGUAL        '='
 #define TOKEN_MULT         '*'
 #define TOKEN_DIV          '/'
-#define TOKEN_INT          "NUM_INT: "
-#define TOKEN_FLOAT        "NUM_REAL: "
 #define TOKEN_PONTOVIRGULA ';'
 #define TOKEN_VIRGULA      ','
 #define TOKEN_DOISPONTOS   ':'
@@ -29,10 +27,10 @@
 #define TOKEN_MENORIGUAL     "<="
 #define TOKEN_INTEGER        "integer"
 #define TOKEN_REAL           "real"
-#define TOKEN_ERRO           "ERRO"
-#define TOKEN_END            "END"
+#define TOKEN_END            "end"
 
 int lugarVariavel = 0; //Variavel global para controle de posição na análise sintática
+int contadorEnd = 0;
 
 //funções declaradas
 void declaracaoDeVariavel(leituraDeLinha tk[], int lugar);
@@ -56,85 +54,75 @@ void palavraNaoEsperada(leituraDeLinha tk[], int lugar){
             } else if (tk[k].real != 0.0f){
                 printf("Numero Real[%.2f] -> ", tk[k].real);
             } else {printf("Numero inteiro-[%d] -> ", tk[k].num);}
-    }lugarVariavel++;
+    }lugarVariavel++; printf("\n");
 }
 
-//sinal 
+//sinal Verifica + e -
 void sinal(leituraDeLinha tk[], int lugar){
     // + | - | 𝜀
     if(tk[lugar].simbolo != '\0'){
         //Se existir um simbolo precisas ser + ou -
         if(tk[lugar].simbolo == TOKEN_MAIS){
-            printf("Variavel-[%c] - ", tk[lugar].simbolo);
+            printf("Variavel-[%c] -> ", tk[lugar].simbolo);
             lugarVariavel++;
         } else if(tk[lugar].simbolo == TOKEN_MENOS){
-            printf("Variavel-[%c] - ", tk[lugar].simbolo);
+            printf("Variavel-[%c] -> ", tk[lugar].simbolo);
             lugarVariavel++;
         } else {
-            printf("Erro de Syntax: '+ ou -' esperada no lugar de: \n\n");
+            printf("Erro de Syntax: '+ ou -' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugar);
-            lugarVariavel++;
         }
     }
 }
 
-//número 
+//número Verrifica o tipo de número real ou inteiro
 void numero(leituraDeLinha tk[], int lugar){
 //   <sinal><inteiro sem sinal> | <sinal><real sem sinal>
     sinal(tk, lugar);
     if(tk[lugarVariavel].num != 0){
-        printf("Numero inteiro-[%d] - ", tk[lugarVariavel].num);
+        printf("Numero inteiro-[%d] -> ", tk[lugarVariavel].num);
         lugarVariavel++;
     } else if(tk[lugarVariavel].real != 0.0f){
-        printf("Numero real-[%d] - ", tk[lugar].num);
+        printf("Numero real-[%.2f] -> ", tk[lugar].real);
         lugarVariavel++;
-    } else {
-        printf("Erro de Syntax: 'número' esperada no lugar de: \n\n");
-            //Mostra oq foi escrito no lugar
-            palavraNaoEsperada(tk, lugarVariavel);
-            
+    } else {printf("Erro de Syntax: 'numero' esperada no lugar de: ");
+            palavraNaoEsperada(tk, lugarVariavel); 
     }
 }
 
-//Relação 
+//Relação Verifica se é { = | == | < | <= | >= | > }
 void relacao(leituraDeLinha tk[], int lugar){
-// = | == | < | <= | >= | >
+
     if(tk[lugar].simbolo == '='){
-        printf("Simbolo-[%c] - ", tk[lugar].simbolo);
+        printf("Simbolo-[%c] -> ", tk[lugar].simbolo);
         lugarVariavel++;
     } else if(tk[lugar].simbolo == '<'){
-        printf("Simbolo-[%c] - ", tk[lugar].simbolo);
+        printf("Simbolo-[%c] -> ", tk[lugar].simbolo);
         lugarVariavel++;
     } else if(tk[lugar].simbolo == '>'){
-        printf("Simbolo-[%c] - ", tk[lugar].simbolo);
+        printf("Simbolo-[%c] -> ", tk[lugar].simbolo);
         lugarVariavel++;
     } else if(strcmp(tk[lugarVariavel].simbolos, TOKEN_MAIORIGUAL) == 0 || strcmp(tk[lugarVariavel].simbolos, TOKEN_MENORIGUAL) == 0){
-        printf("Simbolos-[%s] - ", tk[lugar].simbolos);
+        printf("Simbolos-[%s] -> ", tk[lugar].simbolos);
         lugarVariavel++;
-    } else {
-        //Se não for =, ==, <=, >=, <, >
-        printf("Erro de Syntax: '=, ==, <=, >=, <, >' esperada no lugar de: \n\n");
-        //Mostra oq foi escrito no lugar
+    }else if(strcmp(tk[lugarVariavel].simbolos, TOKEN_DOISPONTOIGUAL) == 0){
+        return;
+    } else {printf("Erro de Syntax: '=, ==, <=, >=, <, >,' esperada no lugar de: ");
         palavraNaoEsperada(tk, lugarVariavel);
-        lugarVariavel++;
     }
 }
 
-//Fator 
+//Fator - Verifica se é uma variavel ou número
 void fator(leituraDeLinha tk[], int lugar){
 // <variável> | <número> | ( <expressão> );
 
-    if(tk[lugar].variavel != NULL){
-        identificador(tk, lugar);
-    } else if(tk[lugar].num != 0){
-        numero(tk, lugar);
-    } else if(tk[lugar].real != 0.0f){
-        numero(tk, lugar);
-    }
+    if(tk[lugar].variavel != NULL){identificador(tk, lugar);
+    } else if(tk[lugar].num != 0){numero(tk, lugar);
+    } else if(tk[lugar].real != 0.0f){numero(tk, lugar);}
 }
 
-//Termo 
+//Termo Verifica variaveis e sinais entre elas
 void termo(leituraDeLinha tk[], int lugar){
 // <fator> { ( * | / ) <fator> };
 
@@ -142,49 +130,36 @@ void termo(leituraDeLinha tk[], int lugar){
 
     while(tk[lugarVariavel].simbolo != '\0'){
         for(int k = lugarVariavel; k < lugarVariavel+1; k++){
-            if(tk[k].simbolo == TOKEN_MULT){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_DIV){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_IGUAL){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_MAIOR){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_MENOR){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_MAIS){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_MENOS){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_DOISPONTOIGUAL){
-                printf("Simbolo-[%c] -> ", tk[k].simbolo);
-            } else if(tk[k].simbolo == TOKEN_PONTOVIRGULA){
-            } else {palavraNaoEsperada(tk, lugarVariavel);}
+            if(tk[k].simbolo == TOKEN_MULT){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_DIV){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_IGUAL){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_MAIOR){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_MENOR){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_MAIS){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_MENOS){ printf("Simbolo-[%c] -> ", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_PONTOVIRGULA){lugarVariavel++; return;}
         }
         lugarVariavel++;
         fator(tk, lugarVariavel);
     }
 }
 
-
 // Expressão simples 
 void expressaoSimples(leituraDeLinha tk[], int lugar){
 // [ + | - ] <termo> { ( + | - ) <termo> }
 
-
     if(tk[lugar].simbolo == TOKEN_MAIS || tk[lugar].simbolo == TOKEN_MENOS){
-    printf("Simbolo-[%c] - ", tk[lugar].simbolo);
+    printf("Simbolo-[%c] -> ", tk[lugar].simbolo);
     lugarVariavel++; 
     }
         
     termo(tk, lugarVariavel);
     while(tk[lugarVariavel].simbolo != '\0'){
         if(tk[lugarVariavel].simbolo == TOKEN_MAIS || tk[lugarVariavel].simbolo == TOKEN_MENOS){
-            printf("Simbolo-[%c] - ", tk[lugarVariavel].simbolo);
+            printf("Simbolo-[%c] -> ", tk[lugarVariavel].simbolo);
             lugarVariavel++;
             termo(tk, lugarVariavel);}
     }
-
 }
 
 //Expressão 
@@ -199,7 +174,7 @@ void expressao(leituraDeLinha tk[], int lugar){
     }
 }
 
-//Comando ------------------------------------------------------- problema aqui!
+//Comando 
 void comando(leituraDeLinha tk[], int lugar){
 // <atribuição> | <comando composto> | <comando condicional> | <comando repetitivo>
 
@@ -207,7 +182,7 @@ void comando(leituraDeLinha tk[], int lugar){
 
     if(strcmp(tk[lugar].palavraReservada, TOKEN_BEGIN) == 0){
         comandoComposto(tk, lugar);
-        lugarVariavel++;
+        
 
     } else if(strcmp(tk[lugar].palavraReservada, TOKEN_IF) == 0){
         // if <expressão> then <comando> [ else <comando> ] -- <Comando condicional>
@@ -218,38 +193,42 @@ void comando(leituraDeLinha tk[], int lugar){
         
         //Verifica se a proxima palavra é then:
         if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_THEN) == 0){
-            printf("palavra Reservada-[%s] -> ", tk[lugarVariavel].palavraReservada);
-            printf("\n");
+            printf("palavra Reservada-[%s]\n", tk[lugarVariavel].palavraReservada);
             lugarVariavel++;
 
             comando(tk, lugarVariavel);
             identificadorDeSimbolos(tk, ';', lugarVariavel);
+            printf("\n");
             
             //Verifica se tem else (não é borigado a ter);
             if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_ELSE) == 0){
-                printf("palavra Reservada-[%s] - ", tk[lugarVariavel].palavraReservada);
+                printf("palavra Reservada-[%s]\n", tk[lugarVariavel].palavraReservada);
                 lugarVariavel++;
-                printf("\n");
-                comando(tk, lugarVariavel);
+
+                comando(tk, lugarVariavel);                
+                
             }
         } else {
             //Se não for then
-            printf("Erro de Syntax: 'then' esperada no lugar de: \n\n");
+            printf("Erro de Syntax: 'then' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugarVariavel);
         }
     } else if(strcmp(tk[lugar].palavraReservada, TOKEN_WHILE) == 0){
         // while <expressão> do <comando> -----> <Comando repetitivo>
 
-        printf("palavra Reservada-[%s] - ", tk[lugar].palavraReservada);
+        printf("palavra Reservada-[%s] -> ", tk[lugar].palavraReservada);
         lugarVariavel++;
+        
         expressao(tk, lugarVariavel);
+        
         if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_DO) == 0){
-            printf("palavra Reservada-[%s] - ", tk[lugarVariavel].palavraReservada);
+            printf("palavra Reservada-[%s]\n", tk[lugarVariavel].palavraReservada);
             lugarVariavel++;
+
         } else {
         //Se não for do
-        printf("Erro de Syntax: 'do' esperada no lugar de: \n\n");
+        printf("Erro de Syntax: 'do' esperada no lugar de: ");
         //Mostra oq foi escrito no lugar
         palavraNaoEsperada(tk, lugarVariavel);   
     }
@@ -262,20 +241,21 @@ void comando(leituraDeLinha tk[], int lugar){
 
         //Verifica se a proxima palavra é :=
         if(strcmp(tk[lugarVariavel].simbolos, TOKEN_DOISPONTOIGUAL) == 0){
-            printf("Variavel-[%s] -> ", tk[lugarVariavel].simbolos);
+            printf("Simbulo Duplo-[%s] -> ", tk[lugarVariavel].simbolos);
             lugarVariavel++;
             expressao(tk, lugarVariavel);
-            identificadorDeSimbolos(tk, ';', lugarVariavel);
-
+            lugarVariavel--;
+            
+             
         } else {
             //Se não for :=
-                    printf("Erro de Syntax: ':=' esperada no lugar de: \n\n");
+                    printf("Erro de Syntax: ':=' esperada no lugar de: ");
                     //Mostra oq foi escrito no lugar
                     palavraNaoEsperada(tk, lugar);
         }
     } else {
         //Se não for Beguin, if, while ou variavel
-        printf("Erro de Syntax: 'atribuicao, comando composto, comando condicional ou comando repetitico' esperada no lugar de: \n\n");
+        printf("Erro de Syntax: 'atribuicao, comando composto, comando condicional ou comando repetitico' esperada no lugar de: ");
         //Mostra oq foi escrito no lugar
         palavraNaoEsperada(tk, lugar);
     }
@@ -286,48 +266,50 @@ void comandoComposto(leituraDeLinha tk[], int lugar){
 // begin <comando> { ; <comando> } end
 
     //Verifica se a palavra é begin:
-    if (tk[lugar].palavraReservada != NULL) {
-            printf("palavra Reservada-[%s] - ", tk[lugar].palavraReservada);
+    if (tk[lugar].palavraReservada != NULL){
+            contadorEnd++;
+            printf("palavra Reservada-[%s]\n", tk[lugar].palavraReservada);
             lugarVariavel++;
 
             //Se a primeira palavra não for begin apresenta msg de erro!
             if(strcmp(tk[lugar].palavraReservada, TOKEN_BEGIN) != 0){
             printf("Erro de Syntax: 'begin' esperado!\n\n");
-
-                //Mostra oq foi escrito no lugar
-                palavraNaoEsperada(tk, lugar);
             }
     } else {
         //Mostra oq foi escrito no lugar da palavra reservada
+        printf("Erro de Syntax: 'begin' esperado no lugar de: ");
         palavraNaoEsperada(tk, lugar);
     }
 
     comando(tk, lugarVariavel);
     
     while(tk[lugarVariavel].simbolo == ';'){
-        printf("Simbolo Duplo-[%s] - ", tk[lugarVariavel].simbolos);
+        printf("Simbolo -[%c] -> ", tk[lugarVariavel].simbolo);
+        printf("\n");
         lugarVariavel++;
+
+        if((tk[lugarVariavel].palavraReservada != NULL && strcmp(tk[lugarVariavel].palavraReservada, TOKEN_END) == 0)){break;}
         comando(tk,lugarVariavel);
     }
 
     //Verifica se a palavra é end
     if (tk[lugarVariavel].palavraReservada != NULL) {
-        printf("palavra Reservada-[%s] - ", tk[lugarVariavel].palavraReservada);
+        printf("palavra Reservada-[%s]\n", tk[lugarVariavel].palavraReservada);
+        lugarVariavel++;
+        contadorEnd--;
+        if(contadorEnd == 0){
+            return;
+        }
         
         //Se a primeira palavra não for program apresenta msg de erro!
         if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_END) != 0){
-        printf("Erro de Syntax: 'end' esperado!\n\n");}
-
-        //mostra oq foi escrito no lugar de program:
+            printf("Erro de Syntax: 'end' esperado!\n\n");}
+    } else {
+        //Mostra oq estava escrito no lugar da palvara reservada
+        printf("\tErro de Syntax: 'end' esperado no lugar de: ");
         palavraNaoEsperada(tk, lugarVariavel);
-        } else {
-            //Mostra oq estava escrito no lugar da palvara reservada
-            printf("\tErro de Syntax: 'end' esperado no lugar de: \n\n");
-            palavraNaoEsperada(tk, lugarVariavel);
-        }
+    }
 }
-
-
 
 //Verifica se existe uma ou mais variaveis
 void declaracaoDeVariavel(leituraDeLinha tk[], int lugar){
@@ -361,7 +343,7 @@ void listaDeIdentificadores(leituraDeLinha tk[], int lugar){
 
                 //Verifica se o proximo caracter é um tipo;
                 if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_INTEGER) == 0){
-                    printf("Palavra reservada-[%s] - ", tk[lugarVariavel].palavraReservada);
+                    printf("Palavra reservada-[%s] -> ", tk[lugarVariavel].palavraReservada);
                     lugarVariavel++;
 
                     //verifica se tem ';'
@@ -369,7 +351,7 @@ void listaDeIdentificadores(leituraDeLinha tk[], int lugar){
                     printf("\n");
 
                 }else if(strcmp(tk[lugarVariavel].palavraReservada, TOKEN_REAL) == 0){
-                    printf("Palavra reservada-[%s] - ", tk[lugarVariavel].palavraReservada);
+                    printf("Palavra reservada-[%s] -> ", tk[lugarVariavel].palavraReservada);
                     lugarVariavel++;
 
                     //verifica se tem ';'
@@ -378,7 +360,7 @@ void listaDeIdentificadores(leituraDeLinha tk[], int lugar){
 
                 } else {
                  //Se não for um tipo;
-                    printf("Erro de Syntax: 'integer ou real' esperada no lugar de: \n\n");
+                    printf("Erro de Syntax: 'integer ou real' esperada no lugar de: ");
                     //Mostra oq foi escrito no lugar;
                     palavraNaoEsperada(tk, lugarVariavel);
 
@@ -387,7 +369,7 @@ void listaDeIdentificadores(leituraDeLinha tk[], int lugar){
                 }
         } else {
             //Falta do :
-            printf("Erro de Syntax: ':' esperada no lugar de: \n\n");
+            printf("Erro de Syntax: ':' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar;
             palavraNaoEsperada(tk, lugarVariavel);
         }
@@ -404,11 +386,11 @@ void parteDeclaracaoDeVariaveis(leituraDeLinha tk[], int lugar){
                 printf("Palavra Reservada-[%s]\n", tk[lugar].palavraReservada);
                 lugarVariavel++;
             } else {
-                printf("Erro de Syntax: 'Var' esperada no lugar de: \n\n");
+                printf("Erro de Syntax: 'Var' esperada no lugar de: ");
                 //Mostra oq foi escrito no lugar
                 palavraNaoEsperada(tk, lugar);}
         } else {
-            printf("Erro de Syntax: 'Var' esperada no lugar de: \n\n");
+            printf("Erro de Syntax: 'Var' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugar);
             printf("\n");
@@ -436,10 +418,10 @@ void identificador(leituraDeLinha tk[], int lugar){
     // <letra> ( <letra> | <dígito> ) * ----> {Varivael}
 
     if (tk[lugar].variavel != NULL) {
-            printf("Variavel-[%s] - ", tk[lugar].variavel);
+            printf("Variavel-[%s] -> ", tk[lugar].variavel);
             lugarVariavel++;
         }else{
-            printf("Erro de Syntax: 'varivael' esperada no lugar de: \n\n");
+            printf("Erro de Syntax: 'varivael' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugarVariavel);
         }
@@ -455,12 +437,11 @@ void identificadorDeSimbolos(leituraDeLinha tk[], char simbolo, int lugar){
         //Verifica se é o simbolo esperado
         if(tk[lugar].simbolo != simbolo){
             printf("Erro de Syntax: '%c' esperado!\n\n", simbolo);
-
             //mostra oq foi escrito no lugar de program:
             palavraNaoEsperada(tk, lugarVariavel);
         }
     } else { 
-        printf("\tErro de Syntax: 'simbolo' esperado no lugar de: \n\n");
+        printf("\tErro de Syntax: 'simbolo' esperado no lugar de: ");
         //Mostra oq foi escrito no lugar
         palavraNaoEsperada(tk, lugarVariavel);
     }
@@ -479,11 +460,10 @@ void programaEBloco(leituraDeLinha tk[]){
             lugarVariavel++;
             
           } else {
-            printf("Erro de Syntax: titulo 'program' esperado!\n\n");
-            palavraNaoEsperada(tk, lugarVariavel);
+            printf("Erro de Syntax: titulo 'program' esperado!");
           }
         } else {
-            printf("Erro de Syntax: 'program' esperado no lugar de: \n\n");
+            printf("Erro de Syntax: 'program' esperado no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugarVariavel);
         }
@@ -499,9 +479,9 @@ void programaEBloco(leituraDeLinha tk[]){
     bloco(tk);
     //Verifica se atem um . no final
     if(tk[lugarVariavel].simbolo == TOKEN_PONTO){
-        printf("Simbolo simples-[%c] - ", tk[lugarVariavel].simbolo);
+        printf("Simbolo simples-[%c]", tk[lugarVariavel].simbolo);
     } else {
-        printf("Erro de Syntax: '.' esperada no lugar de: \n\n");
+        printf("Erro de Syntax: '.' esperada no lugar de: ");
             //Mostra oq foi escrito no lugar
             palavraNaoEsperada(tk, lugarVariavel);
     }
