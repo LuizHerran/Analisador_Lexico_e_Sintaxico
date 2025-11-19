@@ -1,7 +1,6 @@
 #include "sintaxico.h"
 
-int main(void)
-{
+int main(void){
     //Real esta caindo como variavel e primeira leitura esta separada
     printf("\t\tAnalisador lexico:\n");
     abrirarquivo();
