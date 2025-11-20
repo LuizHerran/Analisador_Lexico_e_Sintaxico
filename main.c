@@ -4,7 +4,7 @@
 int main(void){
 
     //Nome do arquivo de entrada
-    char *nome = "fonteInvalida3.pas";
+    char *nome = "fonteValida1.pas";
     
     //Imprime e cria uma arquivo.lex fazendo a análise léxica
     printf("\n\t\tAnalisador lexico:\n");
