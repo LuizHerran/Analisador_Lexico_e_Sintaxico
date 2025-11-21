@@ -62,7 +62,7 @@ char* recuperaTipoDado(char *token, leituraDeLinha tk[]){
 
     //Verifica se ele é um simbolo
     if(strlen(token) == 1 && !isdigit(token[0])){
-        char simbolos[15] = {'+', '-', '=', '*', '/', '(', ')', ';', ',', ':', '.', '>', '<', '{', '}'};
+        char simbolos[15] = {'+', '-', '=', '*', '/', '(', ')', ';', ',', ':', '.', '>', '<'};
         char c = *token;
         
         for(int p = 0; p < strlen(simbolos); p++){

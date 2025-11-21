@@ -11,6 +11,8 @@
 #define TOKEN_PONTO        '.'
 #define TOKEN_MAIOR        '>'
 #define TOKEN_MENOR        '<'
+#define TOKEN_LPAREN       '('
+#define TOKEN_RPAREN       ')'
 #define TOKEN_PROGRAM      "program"
 #define TOKEN_VARIAVEL     "VARIAVEL"
 #define TOKEN_BEGIN        "begin"
@@ -171,6 +173,8 @@ void termo(leituraDeLinha tk[], int lugar){
             } else if(tk[k].simbolo == TOKEN_MENOR){ printf(" Simbolo: %c\n", tk[k].simbolo);
             } else if(tk[k].simbolo == TOKEN_MAIS){ printf(" Simbolo: %c\n", tk[k].simbolo);
             } else if(tk[k].simbolo == TOKEN_MENOS){ printf(" Simbolo: %c\n", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_LPAREN){ printf(" Simbolo: %c\n", tk[k].simbolo);
+            } else if(tk[k].simbolo == TOKEN_RPAREN){ printf(" Simbolo: %c\n", tk[k].simbolo);
             } else if(tk[k].simbolo == TOKEN_PONTOVIRGULA){lugarVariavel++; x--; return;}
         }
         lugarVariavel++;
